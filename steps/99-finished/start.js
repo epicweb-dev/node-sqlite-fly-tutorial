@@ -2,7 +2,7 @@ import fs from "fs";
 import { spawn } from "child_process";
 import os from "os";
 import path from "path";
-import { getInstanceInfo } from "./build/fly";
+import { getInstanceInfo } from "./build/fly.js";
 
 async function go() {
   const { currentInstance, currentIsPrimary, primaryInstance } =
