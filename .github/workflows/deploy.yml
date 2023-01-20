@@ -23,7 +23,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.0
         id: app_name
         with:
-          file: "fly.toml"
+          file: "./apps/99-finished/fly.toml"
           field: "app"
 
       - name: 🐳 Set up Docker Buildx
@@ -82,7 +82,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.0
         id: app_name
         with:
-          file: "fly.toml"
+          file: "./apps/99-finished/fly.toml"
           field: "app"
 
       - name: 🚀 Deploy Staging
