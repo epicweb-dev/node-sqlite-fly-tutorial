@@ -35,12 +35,14 @@ export async function ensurePrimary(res: http.ServerResponse) {
   const { currentIsPrimary, currentInstance, primaryInstance } =
     await getInstanceInfo();
   if (currentIsPrimary) return null;
+
   console.log(
-    `redirecting from ${currentInstance} (current) to ${primaryInstance} (primary)`
+    `replaying from ${currentInstance} (current) to ${primaryInstance} (primary)`
   );
-  return res.writeHead(409, {
+  res.writeHead(409, {
     "fly-replay": `instance=${primaryInstance}`,
   });
+  return res.end();
 }
 
 export function appendHeader(
@@ -138,7 +140,8 @@ export async function handleTransactionalConsistency(
         `Replaying request from ${currentInstance} (current) to ${primaryInstance} (primary)`
       );
       res.setHeader("fly-replay", `instance=${primaryInstance}`);
-      return res.writeHead(409);
+      res.writeHead(409);
+      return res.end();
     }
   }
 }
