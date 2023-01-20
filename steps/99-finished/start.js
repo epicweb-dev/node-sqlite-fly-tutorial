@@ -1,8 +1,8 @@
-import fs from "fs";
-import { spawn } from "child_process";
-import os from "os";
-import path from "path";
-import { getInstanceInfo } from "./build/fly.js";
+const fs = require("fs");
+const { spawn } = require("child_process");
+const os = require("os");
+const path = require("path");
+const { getInstanceInfo } = require("./build/fly");
 
 async function go() {
   const { currentInstance, currentIsPrimary, primaryInstance } =
