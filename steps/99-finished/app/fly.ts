@@ -160,12 +160,12 @@ async function waitForUpToDateTXNumber(sessionTXNumber: number) {
   await sleep(100);
 
   do {
-    console.log("sleeping longer");
     await sleep(30);
     currentTXNumber = await getTXNumber();
+    console.log("slept", { currentTXNumber, sessionTXNumber });
   } while (currentTXNumber >= sessionTXNumber && Date.now() < stopTime);
 
-  console.log("all done waiting");
+  console.log("all done waiting", { currentTXNumber, sessionTXNumber });
 
   if (currentTXNumber >= sessionTXNumber) {
     return true;
