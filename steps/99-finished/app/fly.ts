@@ -67,7 +67,7 @@ const TX_NUM_COOKIE_NAME = "txnum";
  * This should only be used on FLY
  */
 export async function setTxCookie(res: http.ServerResponse) {
-  const txnum = getTXNumber();
+  const txnum = await getTXNumber();
   if (txnum) {
     appendHeader(
       res,
