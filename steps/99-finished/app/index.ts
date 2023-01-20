@@ -35,6 +35,7 @@ async function parseFormBody(req: http.IncomingMessage) {
 
 const server = http
   .createServer(async (req, res) => {
+    console.log(`${req.method} ${req.url}`);
     // ensure that the user hitting an instance that is as up-to-date as they are
     const result = await handleTransactionalConsistency(req, res);
     if (result) return result;

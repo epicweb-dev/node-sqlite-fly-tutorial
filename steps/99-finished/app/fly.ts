@@ -88,7 +88,8 @@ export async function handleTransactionalConsistency(
 ) {
   if (!process.env.FLY) return;
 
-  const { currentIsPrimary, primaryInstance } = await getInstanceInfo();
+  const { currentIsPrimary, currentInstance, primaryInstance } =
+    await getInstanceInfo();
 
   const reqCookie = req.headers.cookie;
   const cookies = reqCookie ? cookie.parse(reqCookie) : {};
@@ -108,6 +109,9 @@ export async function handleTransactionalConsistency(
           })
         );
       } else {
+        console.log(
+          `Replaying request from ${currentInstance} (current) to ${primaryInstance} (primary)`
+        );
         res.setHeader("fly-replay", `instance=${primaryInstance}`);
         return res.writeHead(409);
       }
