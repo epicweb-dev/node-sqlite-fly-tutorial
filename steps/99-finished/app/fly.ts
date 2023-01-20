@@ -32,12 +32,15 @@ export async function getInstanceInfo() {
 }
 
 export async function ensurePrimary(res: http.ServerResponse) {
-  const { currentIsPrimary, primaryInstance } = await getInstanceInfo();
-  if (!currentIsPrimary) {
-    return res.writeHead(409, {
-      "fly-replay": `instance=${primaryInstance}`,
-    });
-  }
+  const { currentIsPrimary, currentInstance, primaryInstance } =
+    await getInstanceInfo();
+  if (currentIsPrimary) return null;
+  console.log(
+    `redirecting from ${currentInstance} (current) to ${primaryInstance} (primary)`
+  );
+  return res.writeHead(409, {
+    "fly-replay": `instance=${primaryInstance}`,
+  });
 }
 
 export function appendHeader(
@@ -68,36 +71,44 @@ const TX_NUM_COOKIE_NAME = "txnum";
  */
 export async function setTxCookie(res: http.ServerResponse) {
   const txnum = await getTXNumber();
-  if (txnum) {
-    appendHeader(
-      res,
-      "Set-Cookie",
-      cookie.serialize("txnum", txnum.toString(), {
-        path: "/",
-        httpOnly: true,
-        sameSite: "lax",
-        secure: true,
-      })
-    );
-  }
+  appendHeader(
+    res,
+    "Set-Cookie",
+    cookie.serialize("txnum", txnum.toString(), {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+    })
+  );
 }
 
 export async function handleTransactionalConsistency(
   req: http.IncomingMessage,
   res: http.ServerResponse
 ) {
-  if (!process.env.FLY) return;
-  if (req.method !== "GET" && req.method !== "HEAD") return;
+  if (!process.env.FLY) {
+    console.log("Not on fly");
+    return;
+  }
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    console.log("Not a get or head request");
+    return;
+  }
 
   const reqCookie = req.headers.cookie;
   const cookies = reqCookie ? cookie.parse(reqCookie) : {};
 
-  if (!cookies[TX_NUM_COOKIE_NAME]) return;
+  if (!cookies[TX_NUM_COOKIE_NAME]) {
+    console.log("no txnum cookie");
+    return;
+  }
 
   const { currentIsPrimary, currentInstance, primaryInstance } =
     await getInstanceInfo();
 
   if (currentIsPrimary) {
+    console.log("on primary, deleting txnum cookie");
     appendHeader(
       res,
       "Set-Cookie",
@@ -107,10 +118,13 @@ export async function handleTransactionalConsistency(
       })
     );
   } else {
+    console.log("waiting for tx number to be up to date");
     const txNumberIsUpToDate = await waitForUpToDateTXNumber(
       Number(cookies[TX_NUM_COOKIE_NAME])
     );
+    console.log({ txNumberIsUpToDate });
     if (txNumberIsUpToDate) {
+      console.log("clearing tx num cookie");
       appendHeader(
         res,
         "Set-Cookie",
@@ -143,9 +157,12 @@ async function waitForUpToDateTXNumber(sessionTXNumber: number) {
   await sleep(100);
 
   do {
+    console.log("sleeping longer");
     await sleep(30);
     currentTXNumber = await getTXNumber();
   } while (currentTXNumber >= sessionTXNumber && Date.now() < stopTime);
+
+  console.log("all done waiting");
 
   if (currentTXNumber >= sessionTXNumber) {
     return true;
