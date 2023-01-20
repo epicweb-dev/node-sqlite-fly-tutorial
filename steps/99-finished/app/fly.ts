@@ -87,34 +87,44 @@ export async function handleTransactionalConsistency(
   res: http.ServerResponse
 ) {
   if (!process.env.FLY) return;
-
-  const { currentIsPrimary, currentInstance, primaryInstance } =
-    await getInstanceInfo();
+  if (req.method !== "GET" && req.method !== "HEAD") return;
 
   const reqCookie = req.headers.cookie;
   const cookies = reqCookie ? cookie.parse(reqCookie) : {};
 
-  if (req.method === "GET" || req.method === "HEAD") {
-    if (cookies[TX_NUM_COOKIE_NAME] && !currentIsPrimary) {
-      const txNumberIsUpToDate = await waitForUpToDateTXNumber(
-        Number(cookies[TX_NUM_COOKIE_NAME])
+  if (!cookies[TX_NUM_COOKIE_NAME]) return;
+
+  const { currentIsPrimary, currentInstance, primaryInstance } =
+    await getInstanceInfo();
+
+  if (currentIsPrimary) {
+    appendHeader(
+      res,
+      "Set-Cookie",
+      cookie.serialize(TX_NUM_COOKIE_NAME, "", {
+        path: "/",
+        expires: new Date(0),
+      })
+    );
+  } else {
+    const txNumberIsUpToDate = await waitForUpToDateTXNumber(
+      Number(cookies[TX_NUM_COOKIE_NAME])
+    );
+    if (txNumberIsUpToDate) {
+      appendHeader(
+        res,
+        "Set-Cookie",
+        cookie.serialize(TX_NUM_COOKIE_NAME, "", {
+          path: "/",
+          expires: new Date(0),
+        })
       );
-      if (txNumberIsUpToDate) {
-        appendHeader(
-          res,
-          "Set-Cookie",
-          cookie.serialize(TX_NUM_COOKIE_NAME, "", {
-            path: "/",
-            expires: new Date(0),
-          })
-        );
-      } else {
-        console.log(
-          `Replaying request from ${currentInstance} (current) to ${primaryInstance} (primary)`
-        );
-        res.setHeader("fly-replay", `instance=${primaryInstance}`);
-        return res.writeHead(409);
-      }
+    } else {
+      console.log(
+        `Replaying request from ${currentInstance} (current) to ${primaryInstance} (primary)`
+      );
+      res.setHeader("fly-replay", `instance=${primaryInstance}`);
+      return res.writeHead(409);
     }
   }
 }
