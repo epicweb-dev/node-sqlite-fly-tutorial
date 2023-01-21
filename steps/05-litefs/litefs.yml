@@ -1,0 +1,17 @@
+# Documented example: https://github.com/superfly/litefs/blob/dec5a7353292068b830001bd2df4830e646f6a2f/cmd/litefs/etc/litefs.yml
+fuse:
+  # Required. This is the mount directory that applications will
+  # use to access their SQLite databases.
+  dir: "${LITEFS_DIR}"
+
+data:
+  # Path to internal data storage.
+  dir: "/data/litefs"
+
+# The lease section specifies how the cluster will be managed. We're using the
+# "consul" lease type so that our application can dynamically change the primary.
+#
+# These environment variables will be available in your Fly.io application.
+# You must specify "experiement.enable_consul" for FLY_CONSUL_URL to be available.
+lease:
+  type: "static"
