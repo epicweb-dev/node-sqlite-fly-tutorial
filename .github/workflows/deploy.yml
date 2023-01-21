@@ -23,7 +23,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.0
         id: app_name
         with:
-          file: "./steps/07-transactional-consistency/fly.toml"
+          file: "./steps/08-transactional-consistency/fly.toml"
           field: "app"
 
       - name: 🐳 Set up Docker Buildx
@@ -50,7 +50,7 @@ jobs:
       - name: 🐳 Docker build
         uses: docker/build-push-action@v3
         with:
-          context: ./steps/07-transactional-consistency
+          context: ./steps/08-transactional-consistency
           push: true
           tags:
             registry.fly.io/${{ steps.app_name.outputs.value }}:${{
@@ -84,7 +84,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.0
         id: app_name
         with:
-          file: "./steps/07-transactional-consistency/fly.toml"
+          file: "./steps/08-transactional-consistency/fly.toml"
           field: "app"
 
       - name: 🚀 Deploy Staging
@@ -92,7 +92,7 @@ jobs:
         uses: superfly/flyctl-actions@1.3
         with:
           args:
-            "deploy --config ./steps/07-transactional-consistency/fly.toml --app
+            "deploy --config ./steps/08-transactional-consistency/fly.toml --app
             ${{ steps.app_name.outputs.value }}-staging --image
             registry.fly.io/${{ steps.app_name.outputs.value }}:${{
             github.ref_name }}-${{ github.sha }}"
@@ -104,7 +104,7 @@ jobs:
         uses: superfly/flyctl-actions@1.3
         with:
           args:
-            "deploy --config ./steps/07-transactional-consistency/fly.toml
+            "deploy --config ./steps/08-transactional-consistency/fly.toml
             --image registry.fly.io/${{ steps.app_name.outputs.value }}:${{
             github.ref_name }}-${{ github.sha }}"
         env:

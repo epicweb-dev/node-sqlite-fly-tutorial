@@ -61,16 +61,6 @@ export function appendHeader(
 
 const TX_NUM_COOKIE_NAME = "txnum";
 
-/**
- * This ensures that the user only continues GET/HEAD requests if they:
- * 1. Do not have a txnum cookie
- * 2. Are running in primary
- * 3. The local txnum is equal or greater than the txnum in the cookie
- *
- * It's also responsible for setting the txnum cookie on post requests
- *
- * This should only be used on FLY
- */
 export async function setTxCookie(res: http.ServerResponse) {
   const txnum = await getTXNumber();
   appendHeader(
