@@ -44,7 +44,6 @@ RUN npm run build
 # build smaller image for running
 FROM base
 
-ENV FLY="true"
 ENV LITEFS_DIR="/litefs"
 ENV DATABASE_URL="file:$LITEFS_DIR/sqlite.db"
 ENV PORT="8080"
