@@ -1,5 +1,3 @@
-# fly.toml file generated for super-simple-node on 2022-11-10T15:40:51-07:00
-
 app = "node-sqlite-fly-tutorial"
 kill_signal = "SIGINT"
 kill_timeout = 5
@@ -10,6 +8,7 @@ processes = []
   destination = "/data"
 
 [experimental]
+  enable_consul = true
   allowed_public_ports = []
   auto_rollback = true
 

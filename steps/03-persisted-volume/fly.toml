@@ -1,16 +1,22 @@
-# fly.toml file generated for super-simple-node on 2022-11-10T15:40:51-07:00
-
 app = "node-sqlite-fly-tutorial"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
+
+[build]
+  builder = "paketobuildpacks/builder:base"
+  buildpacks = ["gcr.io/paketo-buildpacks/nodejs"]
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+  DATABASE_URL = "file:/data/sqlite.db"
 
 [mounts]
   source = "data"
   destination = "/data"
 
 [experimental]
-  enable_consul = true
   allowed_public_ports = []
   auto_rollback = true
 
@@ -38,13 +44,3 @@ processes = []
     interval = "15s"
     restart_limit = 0
     timeout = "2s"
-
-  [[services.http_checks]]
-    interval = 10000
-    grace_period = "600s"
-    method = "get"
-    path = "/healthcheck"
-    protocol = "http"
-    timeout = 5000
-    tls_skip_verify = false
-    [services.http_checks.headers]
