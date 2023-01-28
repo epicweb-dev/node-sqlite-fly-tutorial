@@ -21,9 +21,11 @@ jobs:
 
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
+        with:
+          working-directory: "./steps/12-transactional-consistency"
 
       - name: 🏗 Build
-        run: npm run build
+        run: cd ./steps/12-transactional-consistency && npm run build
 
   deploy:
     name: 🚀 Deploy
@@ -38,7 +40,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.2
         id: app_name
         with:
-          file: "12-transactional-consistency/fly.toml"
+          file: "steps/12-transactional-consistency/fly.toml"
           field: "app"
 
       - name: 🚀 Deploy Staging
@@ -47,7 +49,7 @@ jobs:
         with:
           args:
             "deploy --app ${{ steps.app_name.outputs.value }}-staging
-            --remote-only --config ./12-transactional-consistency/fly.toml"
+            --remote-only --config ./steps/12-transactional-consistency/fly.toml"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -57,6 +59,6 @@ jobs:
         with:
           args:
             "deploy --remote-only --config
-            ./12-transactional-consistency/fly.toml"
+            ./steps/12-transactional-consistency/fly.toml"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
