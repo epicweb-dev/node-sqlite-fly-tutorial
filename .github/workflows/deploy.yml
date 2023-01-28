@@ -44,7 +44,7 @@ jobs:
           field: "app"
 
       - name: 🔩 Install fly
-        uses: superfly/flyctl-actions/setup-flyctl@
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
