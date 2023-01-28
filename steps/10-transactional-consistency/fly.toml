@@ -9,7 +9,6 @@ processes = []
 
 [experimental]
   enable_consul = true
-  allowed_public_ports = []
   auto_rollback = true
 
 [[services]]
@@ -39,10 +38,22 @@ processes = []
 
   [[services.http_checks]]
     interval = 10000
-    grace_period = "600s"
+    grace_period = "1s"
+    method = "get"
+    path = "/"
+    protocol = "http"
+    restart_limit = 0
+    timeout = 500
+    tls_skip_verify = false
+    [services.http_checks.headers]
+
+  [[services.http_checks]]
+    interval = 10000
+    grace_period = "1s"
     method = "get"
     path = "/healthcheck"
     protocol = "http"
-    timeout = 5000
+    restart_limit = 0
+    timeout = 500
     tls_skip_verify = false
     [services.http_checks.headers]
