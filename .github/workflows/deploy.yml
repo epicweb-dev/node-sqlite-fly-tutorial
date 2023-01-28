@@ -4,29 +4,8 @@ on:
     branches:
       - main
       - dev
-  pull_request: {}
 
 jobs:
-  build:
-    name: 🏗 Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: "./steps/12-transactional-consistency"
-
-      - name: 🏗 Build
-        run: cd ./steps/12-transactional-consistency && npm run build
-
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
@@ -40,7 +19,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.2
         id: app_name
         with:
-          file: "steps/12-transactional-consistency/fly.toml"
+          file: "steps/11-transactional-consistency/fly.toml"
           field: "app"
 
       - name: 🔩 Install fly
@@ -49,7 +28,7 @@ jobs:
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
         run:
-          "cd ./steps/12-transactional-consistency && flyctl deploy --app ${{
+          "cd ./steps/11-transactional-consistency && flyctl deploy --app ${{
           steps.app_name.outputs.value }}-staging --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -57,7 +36,7 @@ jobs:
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
         run:
-          "cd ./steps/12-transactional-consistency && flyctl deploy
+          "cd ./steps/11-transactional-consistency && flyctl deploy
           --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
