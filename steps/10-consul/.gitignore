@@ -1,0 +1,6 @@
+node_modules
+.env
+/build
+/.vscode
+prisma/sqlite.db
+prisma/sqlite.db-journal
