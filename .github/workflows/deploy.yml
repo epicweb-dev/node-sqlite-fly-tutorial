@@ -29,6 +29,7 @@ jobs:
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
+          version: v0.9.1
           provenance: false
 
       # Setup cache
