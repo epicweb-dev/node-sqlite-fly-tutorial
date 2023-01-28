@@ -49,7 +49,7 @@ jobs:
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
         run:
-          "cd ./steps/12-transactional-consistency && deploy --app ${{
+          "cd ./steps/12-transactional-consistency && flyctl deploy --app ${{
           steps.app_name.outputs.value }}-staging --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -57,6 +57,7 @@ jobs:
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
         run:
-          "cd ./steps/12-transactional-consistency && fly deploy --remote-only"
+          "cd ./steps/12-transactional-consistency && flyctl deploy
+          --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
