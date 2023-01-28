@@ -4,32 +4,11 @@ on:
     branches:
       - main
       - dev
-  pull_request: {}
 
 jobs:
-  build:
-    name: 🏗 Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-
-      - name: 🏗 Build
-        run: npm run build
-
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest
-    needs: [build]
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
@@ -38,7 +17,7 @@ jobs:
         uses: SebRollen/toml-action@v1.0.2
         id: app_name
         with:
-          file: "12-transactional-consistency/fly.toml"
+          file: "fly.toml"
           field: "app"
 
       - name: 🚀 Deploy Staging
@@ -47,7 +26,7 @@ jobs:
         with:
           args:
             "deploy --app ${{ steps.app_name.outputs.value }}-staging
-            --remote-only --config ./12-transactional-consistency/fly.toml"
+            --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -55,8 +34,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: superfly/flyctl-actions@1.3
         with:
-          args:
-            "deploy --remote-only --config
-            ./12-transactional-consistency/fly.toml"
+          args: "deploy --remote-only"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
