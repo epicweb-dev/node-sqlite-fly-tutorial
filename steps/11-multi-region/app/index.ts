@@ -1,6 +1,6 @@
 import http from "http";
 import { PrismaClient } from "@prisma/client";
-import { ensurePrimary } from "./fly";
+import { ensurePrimary } from "litefs-js/http";
 const prisma = new PrismaClient();
 
 async function getCurrentCount() {
@@ -12,8 +12,6 @@ async function getCurrentCount() {
   }
   return currentCount;
 }
-
-const { PORT } = process.env;
 
 async function parseFormBody(req: http.IncomingMessage) {
   const body = await new Promise<string>((resolve) => {
@@ -47,8 +45,8 @@ const server = http
         break;
       }
       case "POST /": {
-        const result = await ensurePrimary(res);
-        if (result) return result;
+        const replayed = await ensurePrimary(res);
+        if (replayed) return;
 
         const params = await parseFormBody(req);
         const intent = params.get("intent");
@@ -91,7 +89,7 @@ const server = http
       }
     }
   })
-  .listen(PORT, () => {
+  .listen(process.env.PORT, () => {
     const address = server.address();
     if (!address) {
       console.log("Server listening");

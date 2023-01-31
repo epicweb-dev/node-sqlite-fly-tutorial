@@ -4,7 +4,7 @@ import {
   ensurePrimary,
   handleTransactionalConsistency,
   setTxCookie,
-} from "./fly";
+} from "litefs-js/http";
 const prisma = new PrismaClient();
 
 async function getCurrentCount() {
@@ -16,8 +16,6 @@ async function getCurrentCount() {
   }
   return currentCount;
 }
-
-const { PORT } = process.env;
 
 async function parseFormBody(req: http.IncomingMessage) {
   const body = await new Promise<string>((resolve) => {
@@ -37,8 +35,8 @@ const server = http
   .createServer(async (req, res) => {
     console.log(`${req.method} ${req.url}`);
     // ensure that the user hitting an instance that is as up-to-date as they are
-    const result = await handleTransactionalConsistency(req, res);
-    if (result) return result;
+    const replayed = await handleTransactionalConsistency(req, res);
+    if (replayed) return;
 
     switch (`${req.method} ${req.url}`) {
       case "GET /healthcheck": {
@@ -54,8 +52,8 @@ const server = http
         break;
       }
       case "POST /": {
-        const result = await ensurePrimary(res);
-        if (result) return result;
+        const replayed = await ensurePrimary(res);
+        if (replayed) return;
 
         const params = await parseFormBody(req);
         const intent = params.get("intent");
@@ -99,7 +97,7 @@ const server = http
       }
     }
   })
-  .listen(PORT, () => {
+  .listen(process.env.PORT, () => {
     const address = server.address();
     if (!address) {
       console.log("Server listening");

@@ -2,7 +2,7 @@ const fs = require("fs");
 const { spawn } = require("child_process");
 const os = require("os");
 const path = require("path");
-const { getInstanceInfo } = require("./build/fly");
+const { getInstanceInfo } = require("litefs-js");
 
 async function go() {
   const { currentInstance, currentIsPrimary, primaryInstance } =

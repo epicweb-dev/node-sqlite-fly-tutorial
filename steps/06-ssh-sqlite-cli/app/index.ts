@@ -12,8 +12,6 @@ async function getCurrentCount() {
   return currentCount;
 }
 
-const { PORT } = process.env;
-
 async function parseFormBody(req: http.IncomingMessage) {
   const body = await new Promise<string>((resolve) => {
     let body = "";
@@ -87,7 +85,7 @@ const server = http
       }
     }
   })
-  .listen(PORT, () => {
+  .listen(process.env.PORT, () => {
     const address = server.address();
     if (!address) {
       console.log("Server listening");
