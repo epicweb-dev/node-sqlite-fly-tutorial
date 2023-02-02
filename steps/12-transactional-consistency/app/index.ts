@@ -1,10 +1,5 @@
 import http from "http";
 import { PrismaClient } from "@prisma/client";
-import {
-  ensurePrimary,
-  handleTransactionalConsistency,
-  setTxCookie,
-} from "litefs-js/http";
 const prisma = new PrismaClient();
 
 async function getCurrentCount() {
@@ -34,9 +29,6 @@ async function parseFormBody(req: http.IncomingMessage) {
 const server = http
   .createServer(async (req, res) => {
     console.log(`${req.method} ${req.url}`);
-    // ensure that the user hitting an instance that is as up-to-date as they are
-    const replayed = await handleTransactionalConsistency(req, res);
-    if (replayed) return;
 
     switch (`${req.method} ${req.url}`) {
       case "GET /healthcheck": {
@@ -52,9 +44,6 @@ const server = http
         break;
       }
       case "POST /": {
-        const replayed = await ensurePrimary(res);
-        if (replayed) return;
-
         const params = await parseFormBody(req);
         const intent = params.get("intent");
         const currentCount = await getCurrentCount();
@@ -65,7 +54,6 @@ const server = http
           where: { id: currentCount.id },
           data: { count: { [intent]: 1 } },
         });
-        await setTxCookie(res);
         res.writeHead(302, { Location: "/" });
         res.end();
         break;

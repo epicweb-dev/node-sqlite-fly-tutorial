@@ -44,11 +44,10 @@ RUN npm run build
 # build smaller image for running
 FROM base
 
-ENV FLY="true"
 ENV LITEFS_DIR="/litefs"
-ENV DATABASE_FILENAME="sqlite.db"
-ENV DATABASE_URL="file:$LITEFS_DIR/$DATABASE_FILENAME"
-ENV PORT="8080"
+ENV DATABASE_URL="file:$LITEFS_DIR/sqlite.db"
+ENV INTERNAL_PORT="8080"
+ENV PORT="8081"
 ENV NODE_ENV="production"
 
 # Make SQLite CLI accessible via fly ssh console
