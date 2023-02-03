@@ -1,6 +1,5 @@
 import http from "http";
 import { PrismaClient } from "@prisma/client";
-import { ensurePrimary } from "litefs-js/http";
 const prisma = new PrismaClient();
 
 async function getCurrentCount() {
@@ -45,9 +44,6 @@ const server = http
         break;
       }
       case "POST /": {
-        const replayed = await ensurePrimary(res);
-        if (replayed) return;
-
         const params = await parseFormBody(req);
         const intent = params.get("intent");
         const currentCount = await getCurrentCount();
