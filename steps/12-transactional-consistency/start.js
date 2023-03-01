@@ -2,9 +2,22 @@ const fs = require("fs");
 const { spawn } = require("child_process");
 const os = require("os");
 const path = require("path");
+const { getInstanceInfo } = require("litefs-js");
 
 async function go() {
-  await exec("npx prisma migrate deploy");
+  const { currentInstance, currentIsPrimary, primaryInstance } =
+    await getInstanceInfo();
+
+  if (currentIsPrimary) {
+    console.log(
+      `Instance (${currentInstance}) in ${process.env.FLY_REGION} is primary. Deploying migrations.`
+    );
+    await exec("npx prisma migrate deploy");
+  } else {
+    console.log(
+      `Instance (${currentInstance}) in ${process.env.FLY_REGION} is not primary (the primary instance is ${primaryInstance}). Skipping migrations.`
+    );
+  }
 
   console.log("Starting app...");
   await exec("node ./build");

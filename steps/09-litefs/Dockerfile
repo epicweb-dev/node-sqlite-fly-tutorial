@@ -2,8 +2,8 @@
 FROM node:18-bullseye-slim as base
 
 # install openssl and sqlite3 for prisma
-# ca-certificates and fuse for litefs
-RUN apt-get update && apt-get install -y fuse openssl sqlite3
+# ca-certificates and fuse3 for litefs
+RUN apt-get update && apt-get install -y fuse3 openssl sqlite3
 
 # install all node_modules, including dev
 FROM base as deps
@@ -63,7 +63,7 @@ COPY --from=build /app/build /app/build
 ADD . .
 
 # prepare for litefs
-COPY --from=flyio/litefs:sha-8e7b332 /usr/local/bin/litefs /usr/local/bin/litefs
+COPY --from=flyio/litefs:sha-404e00f /usr/local/bin/litefs /usr/local/bin/litefs
 ADD litefs.yml /etc/litefs.yml
 
 CMD ["litefs", "mount", "--", "npm", "start"]
