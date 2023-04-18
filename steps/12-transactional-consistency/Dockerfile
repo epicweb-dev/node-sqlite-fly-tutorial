@@ -64,7 +64,7 @@ COPY --from=build /app/build /app/build
 ADD . .
 
 # prepare for litefs
-COPY --from=flyio/litefs:sha-404e00f /usr/local/bin/litefs /usr/local/bin/litefs
+COPY --from=flyio/litefs:0.4.0 /usr/local/bin/litefs /usr/local/bin/litefs
 ADD litefs.yml /etc/litefs.yml
 
 CMD ["litefs", "mount", "--", "npm", "start"]
